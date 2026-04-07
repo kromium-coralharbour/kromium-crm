@@ -5,6 +5,7 @@ import { TierBadge, StatusBadge, Card, CardHead, DetailSection, InfoGrid, TaskIt
 import { fmtDate, fmtRelative } from '@/lib/utils'
 import LeadActions from './LeadActions'
 import ActionButton from '@/components/ActionButton'
+import GenerateProposalSection from './GenerateProposalSection'
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -46,6 +47,9 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
               </div>
               <LeadActions lead={lead} />
             </Card>
+
+            {/* Generate Proposal */}
+            <GenerateProposalSection lead={lead} notes={notes ?? []} />
 
             {/* Contact info */}
             <Card style={{ marginBottom:12 }}>
@@ -101,7 +105,7 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
                     <TaskItem
                       key={t.id}
                       title={t.title}
-                      meta={`${t.priority} priority · ${t.profiles?.full_name ?? 'Unassigned'}`}
+                      meta={`${t.priority} priority - ${t.profiles?.full_name ?? 'Unassigned'}`}
                       due={overdue ? 'Overdue' : t.due_date ? fmtDate(t.due_date) : undefined}
                       done={t.status === 'done'}
                     />

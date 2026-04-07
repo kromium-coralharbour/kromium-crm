@@ -81,7 +81,7 @@ export default async function TasksPage({ searchParams }: { searchParams: { filt
                     <tr key={t.id} style={{ opacity: isDone ? .6 : 1 }}>
                       <td style={{ padding:'11px 16px', borderBottom:'1px solid rgba(255,255,255,0.07)', width:32 }}>
                         <div style={{ width:14, height:14, borderRadius:2, border: isDone ? 'none' : '1.5px solid rgba(255,255,255,0.2)', background: isDone ? '#22C55E' : 'transparent', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                          {isDone && <span style={{ color:'#fff', fontSize:9 }}>✓</span>}
+                          {isDone && <span style={{ color:'#fff', fontSize:8, fontWeight:800, lineHeight:1 }}>OK</span>}
                         </div>
                       </td>
                       <td style={{ padding:'11px 16px', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
@@ -96,7 +96,7 @@ export default async function TasksPage({ searchParams }: { searchParams: { filt
                       <td style={{ padding:'11px 16px', fontSize:'.78rem', color:'#6B7794', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>{t.auto_generated ? '⚡ Auto' : 'Manual'}</td>
                       <td style={{ padding:'11px 16px', fontSize:'.82rem', color:'#9AA0B8', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>{t.profiles?.full_name ?? '—'}</td>
                       <td style={{ padding:'11px 16px', fontSize:'.78rem', borderBottom:'1px solid rgba(255,255,255,0.07)', color: isOverdue ? '#EF4444' : '#9AA0B8', whiteSpace:'nowrap' }}>
-                        {t.due_date ? (isOverdue ? `Overdue · ${fmtDate(t.due_date)}` : fmtDate(t.due_date)) : '—'}
+                        {t.due_date ? (isOverdue ? `Overdue - ${fmtDate(t.due_date)}` : fmtDate(t.due_date)) : '—'}
                       </td>
                       <td style={{ padding:'11px 16px', fontSize:'.75rem', fontWeight:700, color: PRIORITY_COLOR[t.priority] ?? '#6B7794', borderBottom:'1px solid rgba(255,255,255,0.07)', textTransform:'uppercase' }}>{t.priority}</td>
                       <td style={{ padding:'11px 16px', borderBottom:'1px solid rgba(255,255,255,0.07)' }}><StatusBadge status={t.status} /></td>

@@ -26,7 +26,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: { s
 
   return (
     <>
-      <Topbar title="Projects" action={{ label:'+ New Project' }} />
+      <Topbar title="Projects" />
       <div style={{ flex:1, overflowY:'auto', padding:24 }}>
         {/* Filter */}
         <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:12 }}><ActionButton type="project" label="+ New Project" /></div>

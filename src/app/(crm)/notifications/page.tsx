@@ -5,7 +5,7 @@ import { fmtRelative } from '@/lib/utils'
 import Link from 'next/link'
 
 const ICONS: Record<string, string> = {
-  hot_lead: '🔥', new_lead: '📧', task: '✅', payment: '💰', proposal: '📋', general: '🔔'
+  hot_lead: 'HOT', new_lead: 'NEW', task: 'TASK', payment: 'PAY', proposal: 'PROP', general: 'NOTE'
 }
 
 export default async function NotificationsPage() {
@@ -35,7 +35,7 @@ export default async function NotificationsPage() {
               className="hover:bg-white/[0.03]"
               >
                 <div style={{ display:'flex', gap:12, alignItems:'flex-start' }}>
-                  <span style={{ fontSize:'1.1rem', flexShrink:0 }}>{ICONS[n.type] ?? '🔔'}</span>
+                  <span style={{ fontSize:'.65rem', fontWeight:700, letterSpacing:'.06em', padding:'2px 6px', background:'rgba(242,100,25,0.12)', color:'#F26419', flexShrink:0 }}>{ICONS[n.type] ?? 'NOTE'}</span>
                   <div style={{ flex:1 }}>
                     <div style={{ fontSize:'.85rem', color:'#EEF0F5', fontWeight: n.read ? 400 : 600, lineHeight:1.5 }}>{n.title}</div>
                     <div style={{ fontSize:'.8rem', color:'#9AA0B8', lineHeight:1.5, marginTop:2 }}>{n.body}</div>

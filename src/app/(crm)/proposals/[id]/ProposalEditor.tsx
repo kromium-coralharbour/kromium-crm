@@ -78,7 +78,7 @@ export default function ProposalEditor({ proposal }: { proposal: any }) {
           {saving ? 'Saving...' : 'Save Changes'}
         </button>
         <button onClick={generatePDF} disabled={generating} style={{ padding:'8px 18px', background: generating ? '#333' : '#22C55E', color:'#fff', border:'none', fontFamily:'Outfit,sans-serif', fontSize:'.8rem', fontWeight:700, letterSpacing:'.04em', textTransform:'uppercase', cursor: generating ? 'not-allowed':'pointer', clipPath:'polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)' }}>
-          {generating ? 'Generating...' : '⬇ Download PDF'}
+          {generating ? 'Generating...' : 'Download PDF'}
         </button>
         <select value={status} onChange={e => setStatus(e.target.value)} style={{ background:'#192035', border:'1px solid rgba(255,255,255,0.12)', color:'#EEF0F5', fontSize:'.82rem', padding:'8px 12px', cursor:'pointer', outline:'none', fontFamily:'Inter,sans-serif' }}>
           {['draft','sent','negotiating','won','lost'].map(s => <option key={s} value={s}>{s}</option>)}

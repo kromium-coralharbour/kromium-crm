@@ -343,7 +343,7 @@ export function TaskItem({ title, meta, due, done, onToggle }: {
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
         }}
       >
-        {done && <span style={{ color:'#fff', fontSize:10 }}>✓</span>}
+        {done && <span style={{ color:'#fff', fontSize:8, fontWeight:800, lineHeight:1 }}>OK</span>}
       </button>
       <div style={{ flex:1 }}>
         <div style={{ fontSize:'.82rem', color: done ? '#6B7794' : '#EEF0F5', textDecoration: done ? 'line-through' : 'none' }}>{title}</div>

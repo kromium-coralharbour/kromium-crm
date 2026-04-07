@@ -76,7 +76,7 @@ export default function ProjectTaskBoard({ tasks: initialTasks, projectId, profi
                   flexShrink:0, transition:'all .15s',
                 }}
               >
-                {isDone && <span style={{ color:'#fff', fontSize:9 }}>✓</span>}
+                {isDone && <span style={{ color:'#fff', fontSize:8, fontWeight:800, lineHeight:1 }}>OK</span>}
               </button>
               {i < tasks.length - 1 && (
                 <div style={{ width:1, flex:1, minHeight:20, background: isDone ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.07)', margin:'3px 0' }} />

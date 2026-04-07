@@ -261,10 +261,10 @@ function ListView({ tasks, profiles, projectId, accent, onUpdate, onDelete, onAd
                           onClick={e => { e.stopPropagation(); /* toggle status inline */ }}
                           style={{ width: 15, height: 15, borderRadius: 3, flexShrink: 0, border: isDone ? 'none' : '1.5px solid rgba(255,255,255,0.2)', background: isDone ? '#22C55E' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
-                          {isDone && <span style={{ color: '#fff', fontSize: 9 }}>✓</span>}
+                          {isDone && <span style={{ color: '#fff', fontSize: 8, fontWeight: 800, lineHeight: 1 }}>OK</span>}
                         </div>
                         <span style={{ fontSize: '.83rem', color: isDone ? '#6B7794' : '#EEF0F5', textDecoration: isDone ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.title}</span>
-                        {task.description && <span style={{ fontSize: '.68rem', color: '#6B7794', flexShrink: 0 }}>💬</span>}
+                        {task.description && <span style={{ fontSize: '.6rem', color: '#6B7794', flexShrink: 0, fontWeight: 700, letterSpacing: '.04em' }}>NOTE</span>}
                       </div>
                       {/* Assignee */}
                       <div style={{ padding: '10px 8px', display: 'flex', alignItems: 'center' }}>
@@ -438,7 +438,7 @@ function TimelineView({ tasks, profiles, accent }: { tasks: Task[]; profiles: Pr
   const withDates = tasks.filter(t => t.due_date).sort((a, b) => (a.due_date ?? '') < (b.due_date ?? '') ? -1 : 1)
   const noDates   = tasks.filter(t => !t.due_date)
 
-  const statusIcon: Record<string,string> = { done: '✓', in_progress: '▶', open: '○', cancelled: '✕' }
+  const statusIcon: Record<string,string> = { done: 'DONE', in_progress: 'WIP', open: 'OPEN', cancelled: 'CANC' }
 
   return (
     <div style={{ padding: '8px 0' }}>
