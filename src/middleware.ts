@@ -4,18 +4,15 @@ import { createServerClient } from '@supabase/ssr'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Always allow static assets and API routes through
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api/') ||
-    pathname.includes('.') // static files
-  ) {
+  // Pass API routes and static files through immediately
+  if (pathname.startsWith('/api/') || pathname.startsWith('/_next') || pathname.includes('.')) {
     return NextResponse.next()
   }
 
-  // If env vars are missing, just serve the login page to avoid a crash
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // If env vars not set, send everything to login
   if (!supabaseUrl || !supabaseKey) {
     if (pathname !== '/login') {
       return NextResponse.redirect(new URL('/login', request.url))
@@ -23,39 +20,39 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  let supabaseResponse = NextResponse.next({ request })
+  // Refresh session cookies - this is the ONLY job of middleware
+  // Actual auth redirect is handled in the (crm)/layout.tsx server component
+  let response = NextResponse.next({ request })
 
   try {
     const supabase = createServerClient(supabaseUrl, supabaseKey, {
       cookies: {
-        getAll() { return request.cookies.getAll() },
-        setAll(cookiesToSet) {
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
+          response = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            response.cookies.set(name, value, options)
           )
         },
       },
     })
 
+    // Just refresh the session - don't redirect here
+    // The (crm)/layout.tsx handles auth protection
     const { data: { user } } = await supabase.auth.getUser()
 
-    const isAuth      = !!user
-    const isLoginPage = pathname === '/login'
-
-    if (!isAuth && !isLoginPage) {
+    // Only handle the login redirect cases
+    if (!user && pathname !== '/login' && !pathname.startsWith('/api')) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
-
-    if (isAuth && isLoginPage) {
+    if (user && pathname === '/login') {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
-    return supabaseResponse
-  } catch (err) {
-    // If Supabase is unreachable, redirect to login rather than crashing
-    console.error('Middleware error:', err)
+    return response
+  } catch {
+    // Any error - send to login
     if (pathname !== '/login') {
       return NextResponse.redirect(new URL('/login', request.url))
     }
@@ -65,6 +62,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+    '/((?!_next/static|_next/image|favicon\\.ico|manifest\\.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 }
