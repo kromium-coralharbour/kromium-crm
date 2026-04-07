@@ -11,7 +11,8 @@ const ROLE_COLORS: Record<string, { bg: string; color: string }> = {
 
 export default async function TeamPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user ?? null
   const { data: currentProfile } = await supabase.from('profiles').select('role').eq('id', user?.id ?? '').single()
 
   const { data: team } = await supabase.from('profiles').select('*').order('created_at')

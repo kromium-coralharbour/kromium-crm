@@ -7,7 +7,8 @@ import SettingsClient from './SettingsClient'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user ?? null
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user?.id ?? '').single()
 
   if (profile?.role !== 'admin') redirect('/dashboard')
