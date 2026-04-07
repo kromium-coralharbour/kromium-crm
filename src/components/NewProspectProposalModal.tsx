@@ -211,9 +211,9 @@ export default function NewProspectProposalModal({ open, onClose }: Props) {
     try {
       // 1. Create a lead record
       const formData = { ...data, ...arrays, industry: prospect.industry, country: prospect.country }
-      const { data: lead } = await supabase.from('leads').insert({
+      const { data: lead, error: leadErr } = await supabase.from('leads').insert({
         first_name:      prospect.first_name,
-        last_name:       prospect.last_name,
+        last_name:       prospect.last_name || '',
         email:           prospect.email,
         phone:           prospect.phone || null,
         company:         prospect.company || null,
@@ -228,14 +228,13 @@ export default function NewProspectProposalModal({ open, onClose }: Props) {
         form_data:       formData,
         score_breakdown: {},
         email_sent:      false,
-        manual_entry:    true,
       }).select().single()
 
-      if (!lead) throw new Error('Failed to create lead')
+      if (leadErr || !lead) throw new Error(leadErr?.message ?? 'Failed to create lead')
 
       // 2. Create the proposal
       const title = proposalTitle || autoTitle()
-      const { data: proposal } = await supabase.from('proposals').insert({
+      const { data: proposal, error: propErr } = await supabase.from('proposals').insert({
         lead_id:       lead.id,
         title,
         status:        'draft',
@@ -252,7 +251,7 @@ export default function NewProspectProposalModal({ open, onClose }: Props) {
         sections:      [],
       }).select().single()
 
-      if (!proposal) throw new Error('Failed to create proposal')
+      if (propErr || !proposal) throw new Error(propErr?.message ?? 'Failed to create proposal')
 
       onClose()
       router.push(`/proposals/${proposal.id}`)
