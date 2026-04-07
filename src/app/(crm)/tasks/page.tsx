@@ -1,8 +1,10 @@
+import ActionButton from '@/components/ActionButton'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Topbar from '@/components/Topbar'
 import { Card, StatusBadge } from '@/components/ui'
 import { fmtDate } from '@/lib/utils'
+import { NewTaskModal } from '@/components/Modals'
 
 const PRIORITY_COLOR: Record<string, string> = {
   urgent:'#EF4444', high:'#F59E0B', medium:'#3B82F6', low:'#6B7794'
@@ -39,17 +41,20 @@ export default async function TasksPage({ searchParams }: { searchParams: { filt
     <>
       <Topbar title="Tasks" />
       <div style={{ flex:1, overflowY:'auto', padding:24 }}>
-        <div style={{ display:'flex', gap:8, marginBottom:16, flexWrap:'wrap' }}>
-          {filters.map(f => (
-            <Link key={f.key} href={`/tasks?filter=${f.key}`} style={{ textDecoration:'none' }}>
-              <div style={{
-                padding:'5px 12px', fontSize:'.72rem', fontWeight:600,
-                background: filter === f.key ? 'rgba(242,100,25,0.10)' : '#141929',
-                border: filter === f.key ? '1px solid #F26419' : '1px solid rgba(255,255,255,0.07)',
-                color: filter === f.key ? '#F26419' : '#9AA0B8', cursor:'pointer',
-              }}>{f.label}</div>
-            </Link>
-          ))}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16, flexWrap:'wrap', gap:8 }}>
+          <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+            {filters.map(f => (
+              <Link key={f.key} href={`/tasks?filter=${f.key}`} style={{ textDecoration:'none' }}>
+                <div style={{
+                  padding:'5px 12px', fontSize:'.72rem', fontWeight:600,
+                  background: filter === f.key ? 'rgba(242,100,25,0.10)' : '#141929',
+                  border: filter === f.key ? '1px solid #F26419' : '1px solid rgba(255,255,255,0.07)',
+                  color: filter === f.key ? '#F26419' : '#9AA0B8', cursor:'pointer',
+                }}>{f.label}</div>
+              </Link>
+            ))}
+          </div>
+          <ActionButton type="task" label="+ New Task" />
         </div>
 
         <Card>

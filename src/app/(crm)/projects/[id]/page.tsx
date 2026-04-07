@@ -1,3 +1,4 @@
+import ActionButton from '@/components/ActionButton'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -67,16 +68,19 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
 
             {/* Task board */}
             <Card style={{ marginBottom:12 }}>
-              <CardHead title="Task Timeline" action="+ Add Task" />
+              <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontFamily:'Outfit,sans-serif', fontSize:'.95rem', fontWeight:700, color:'#fff' }}>Task Timeline</div>
+            </div>
               <ProjectTaskBoard tasks={tasks} projectId={project.id} profiles={profiles ?? []} />
             </Card>
 
             {/* Notes */}
             <Card>
-              <CardHead title="Notes" />
+              <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontFamily:'Outfit,sans-serif', fontSize:'.95rem', fontWeight:700, color:'#fff' }}>Notes</div>
+            </div>
               <div style={{ padding:'12px 16px' }}>
-                <textarea placeholder="Add a project note..." style={{ width:'100%', background:'#192035', border:'1px solid rgba(255,255,255,0.07)', color:'#EEF0F5', fontFamily:'Inter,sans-serif', fontSize:'.82rem', padding:'9px 12px', outline:'none', resize:'vertical', minHeight:64, marginBottom:6 }} />
-                <button style={{ padding:'6px 14px', background:'#F26419', color:'#fff', border:'none', fontFamily:'Outfit,sans-serif', fontSize:'.78rem', fontWeight:700, letterSpacing:'.04em', textTransform:'uppercase', cursor:'pointer', clipPath:'polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)' }}>Add Note</button>
+                <ActionButton type="note" label="+ Add Note" projectId={project.id} />
                 <div style={{ marginTop:12 }}>
                   {(notes ?? []).map((n: any) => (
                     <NoteItem key={n.id} content={n.content} author={n.profiles?.full_name ?? '—'} date={fmtRelative(n.created_at)} />

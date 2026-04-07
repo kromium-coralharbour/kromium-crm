@@ -1,3 +1,4 @@
+import ActionButton from '@/components/ActionButton'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Topbar from '@/components/Topbar'
@@ -17,8 +18,11 @@ export default async function ClientsPage() {
 
   return (
     <>
-      <Topbar title="Clients" action={{ label:'+ New Client' }} />
+      <Topbar title="Clients"  />
       <div style={{ flex:1, overflowY:'auto', padding:24 }}>
+        <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:16 }}>
+          <ActionButton type="client" label="+ New Client" />
+        </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12, marginBottom:20 }}>
           <StatCard label="Total Clients" value={(clients ?? []).length} accent="#F26419" />
           <StatCard label="Active" value={activeCount ?? 0} accent="#22C55E" />

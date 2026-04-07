@@ -1,3 +1,4 @@
+import ActionButton from '@/components/ActionButton'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -43,7 +44,10 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
           <div>
             {/* Projects */}
             <Card style={{ marginBottom:12 }}>
-              <CardHead title="Projects" action="+ New Project" />
+              <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontFamily:'Outfit,sans-serif', fontSize:'.95rem', fontWeight:700, color:'#fff' }}>Projects</div>
+              <ActionButton type="project" label="+ New Project" clientId={client.id} />
+            </div>
               <div style={{ padding:16 }}>
                 {(projects ?? []).length === 0 && (
                   <div style={{ color:'#6B7794', fontSize:'.82rem', padding:'8px 0' }}>No projects yet</div>
@@ -78,7 +82,10 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
 
             {/* Revenue records */}
             <Card style={{ marginBottom:12 }}>
-              <CardHead title="Revenue Records" action="+ Add Record" />
+              <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontFamily:'Outfit,sans-serif', fontSize:'.95rem', fontWeight:700, color:'#fff' }}>Revenue Records</div>
+              <ActionButton type="revenue" label="+ Add Record" clientId={client.id} />
+            </div>
               <div style={{ overflowX:'auto' }}>
                 <table style={{ width:'100%', borderCollapse:'collapse' }}>
                   <thead>
@@ -112,10 +119,11 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
 
             {/* Notes */}
             <Card>
-              <CardHead title="Notes" />
+              <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontFamily:'Outfit,sans-serif', fontSize:'.95rem', fontWeight:700, color:'#fff' }}>Notes</div>
+              <ActionButton type="note" label="+ Add Note" clientId={client.id} />
+            </div>
               <div style={{ padding:'12px 16px' }}>
-                <textarea placeholder="Add a note..." style={{ width:'100%', background:'#192035', border:'1px solid rgba(255,255,255,0.07)', color:'#EEF0F5', fontFamily:'Inter,sans-serif', fontSize:'.82rem', padding:'9px 12px', outline:'none', resize:'vertical', minHeight:64, marginBottom:6 }} />
-                <button style={{ padding:'6px 14px', background:'#F26419', color:'#fff', border:'none', fontFamily:'Outfit,sans-serif', fontSize:'.78rem', fontWeight:700, letterSpacing:'.04em', textTransform:'uppercase', cursor:'pointer', clipPath:'polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)' }}>Add Note</button>
                 <div style={{ marginTop:12 }}>
                   {(notes ?? []).map((n: any) => (
                     <NoteItem key={n.id} content={n.content} author={n.profiles?.full_name ?? '—'} date={fmtRelative(n.created_at)} />
@@ -147,7 +155,10 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
             {/* Proposals */}
             {(proposals ?? []).length > 0 && (
               <Card>
-                <CardHead title="Proposals" />
+                <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div style={{ fontFamily:'Outfit,sans-serif', fontSize:'.95rem', fontWeight:700, color:'#fff' }}>Proposals</div>
+                <ActionButton type="proposal" label="+ New Proposal" clientId={client.id} />
+              </div>
                 <div style={{ padding:12 }}>
                   {(proposals ?? []).map((p: any) => (
                     <Link key={p.id} href={`/proposals/${p.id}`} style={{ textDecoration:'none' }}>

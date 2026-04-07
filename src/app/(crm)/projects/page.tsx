@@ -1,3 +1,4 @@
+import ActionButton from '@/components/ActionButton'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Topbar from '@/components/Topbar'
@@ -28,6 +29,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: { s
       <Topbar title="Projects" action={{ label:'+ New Project' }} />
       <div style={{ flex:1, overflowY:'auto', padding:24 }}>
         {/* Filter */}
+        <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:12 }}><ActionButton type="project" label="+ New Project" /></div>
         <div style={{ display:'flex', gap:8, marginBottom:20, flexWrap:'wrap' }}>
           {statuses.map(s => (
             <Link key={s} href={s ? `/projects?status=${s}` : '/projects'} style={{ textDecoration:'none' }}>

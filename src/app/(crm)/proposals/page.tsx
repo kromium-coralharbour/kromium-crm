@@ -1,3 +1,4 @@
+import ActionButton from '@/components/ActionButton'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Topbar from '@/components/Topbar'
@@ -13,8 +14,11 @@ export default async function ProposalsPage() {
 
   return (
     <>
-      <Topbar title="Proposals" action={{ label:'+ New Proposal' }} />
+      <Topbar title="Proposals"  />
       <div style={{ flex:1, overflowY:'auto', padding:24 }}>
+        <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:16 }}>
+          <ActionButton type="proposal" label="+ New Proposal" />
+        </div>
         <Card>
           <div style={{ overflowX:'auto' }}>
             <table style={{ width:'100%', borderCollapse:'collapse' }}>

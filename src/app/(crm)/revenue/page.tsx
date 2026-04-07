@@ -1,3 +1,4 @@
+import ActionButton from '@/components/ActionButton'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Topbar from '@/components/Topbar'
@@ -25,8 +26,11 @@ export default async function RevenuePage() {
 
   return (
     <>
-      <Topbar title="Revenue" action={{ label:'+ Add Record' }} />
+      <Topbar title="Revenue"  />
       <div style={{ flex:1, overflowY:'auto', padding:24 }}>
+        <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:16 }}>
+          <ActionButton type="revenue" label="+ Add Record" />
+        </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginBottom:20 }}>
           <StatCard label="This Month"    value={fmt$(monthTotal)}        accent="#22C55E" meta="Paid invoices" />
           <StatCard label="Total Billed"  value={fmtFull$(totalPaid)}     accent="#F26419" />
