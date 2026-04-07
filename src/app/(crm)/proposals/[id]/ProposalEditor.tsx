@@ -73,6 +73,7 @@ function SectionCard({
           {!section.locked && (
             <button onClick={onDelete} style={{ padding:'3px 8px', fontSize:'.72rem', background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', color:'#EF4444', cursor:'pointer' }}>x</button>
           )}
+
           {/* Collapse */}
           <button onClick={() => setCollapsed(p => !p)} style={{ padding:'3px 8px', fontSize:'.72rem', background:'transparent', border:'1px solid rgba(255,255,255,0.07)', color:'#9AA0B8', cursor:'pointer' }}>
             {collapsed ? '+' : '-'}
@@ -108,7 +109,7 @@ function SectionCard({
 }
 
 // ── Main Editor ───────────────────────────────────────────────────────────────
-export default function ProposalEditor({ proposal }: { proposal: any }) {
+export default function ProposalEditor({ proposal, lead, notes }: { proposal: any; lead?: any; notes?: any[] }) {
   const router  = useRouter()
   const supabase = createClient()
 
@@ -134,34 +135,111 @@ export default function ProposalEditor({ proposal }: { proposal: any }) {
     if (Array.isArray(proposal.sections) && proposal.sections.length > 0) {
       return proposal.sections as ProposalSection[]
     }
-    // First time — generate from template, pre-fill scope from lead data
+    // First time — generate from template and substitute all placeholders
     const defaults = getDefaultSections(serviceType)
-    // Pre-fill understanding-your-operation / executive summary with lead context
-    const lead = proposal.leads
-    if (lead) {
-      const fd = (lead.form_data ?? {}) as Record<string, any>
-      defaults.forEach(s => {
-        if (s.id === 'understanding-your-operation' || s.id === 'current-foundation' || s.id === 'where-you-are-now') {
-          const parts: string[] = []
-          if (lead.company)          parts.push(`Client: ${lead.company}`)
-          if (lead.industry)         parts.push(`Industry: ${lead.industry.replace(/_/g, ' ')}`)
-          if (lead.country)          parts.push(`Market: ${lead.country}`)
-          if (fd.business_context)   parts.push(`\n${fd.business_context}`)
-          if (fd.business_desc)      parts.push(`\n${fd.business_desc}`)
-          if (fd.challenge)          parts.push(`\nMain challenge: ${fd.challenge}`)
-          if (fd.pain && !Array.isArray(fd.pain)) parts.push(`\n${fd.pain}`)
-          if (fd.success)            parts.push(`\nSuccess definition: ${fd.success}`)
-          if (Array.isArray(fd.pain)) parts.push(`\nPain points: ${fd.pain.join(', ')}`)
-          if (parts.length > 0) s.content = parts.filter(Boolean).join('\n')
-        }
-        if (s.id === 'what-the-site-will-achieve' && fd.goal) {
-          s.content = s.content.replace('[From enquiry — leads / bookings / credibility / e-commerce / CRM feed]', fd.goal)
-        }
-        if (s.id === 'executive-summary') {
-          s.content = s.content.replace('[Client Name]', lead.company ?? `${lead.first_name} ${lead.last_name}`)
-        }
-      })
+    const leadData = proposal.leads ?? null
+    const fd = (leadData?.form_data ?? {}) as Record<string, any>
+
+    // Build substitution map from all available data
+    const company  = proposal.client_company
+      ?? leadData?.company
+      ?? (leadData ? `${leadData.first_name} ${leadData.last_name}` : '[Client Name]')
+    const industry = (leadData?.industry ?? fd.industry ?? '[Industry]').replace(/_/g, ' ')
+    const country  = leadData?.country ?? fd.country ?? '[Market / Country]'
+    const market   = country
+
+    // Build context for the "understanding" section from form data
+    const painPoints = Array.isArray(fd.pain) ? fd.pain.join(', ') : (fd.pain ?? '')
+    const features   = Array.isArray(fd.features) ? fd.features.join(', ') : ''
+    const deliverables = Array.isArray(fd.deliverables) ? fd.deliverables.join(', ') : ''
+    const services   = Array.isArray(fd.services) ? fd.services.join(', ') : ''
+    const goal       = fd.goal ?? fd.primary_goal ?? ''
+    const budget     = fd.budget ? `USD ${Number(fd.budget).toLocaleString()}` : fd.budget_range?.replace(/-/g,' ') ?? ''
+    const teamSize   = fd.team_size ?? ''
+    const brandStage = fd.brand_stage ?? ''
+    const pageCount  = fd.page_count ?? ''
+    const timeline   = fd.timeline ?? ''
+    const context    = fd.business_context ?? fd.business_desc ?? fd.description ?? ''
+
+    function substitute(text: string): string {
+      return text
+        .replace(/\[Client Name\]/g,  company)
+        .replace(/\[Industry\]/g,     industry)
+        .replace(/\[Market\]/g,       market)
+        .replace(/\[Country\]/g,      country)
+        .replace(/\[Market \/ Country\]/g, country)
     }
+
+    defaults.forEach(s => {
+      // Apply placeholder substitution to all sections
+      s.content = substitute(s.content)
+      s.title   = substitute(s.title)
+
+      // Enrich specific sections with real form data
+      if ((s.id === 'understanding-your-operation' || s.id === 'current-foundation') && leadData) {
+        const parts: string[] = [substitute(s.content)]
+        const extras: string[] = []
+        if (context)      extras.push(`\n\nBackground: ${context}`)
+        if (goal)         extras.push(`Primary goal: ${goal}`)
+        if (painPoints)   extras.push(`Pain points identified: ${painPoints}`)
+        if (features)     extras.push(`Features required: ${features}`)
+        if (teamSize)     extras.push(`Team size: ${teamSize}`)
+        if (budget)       extras.push(`Budget indicated: ${budget}`)
+        if (timeline)     extras.push(`Timeline: ${timeline}`)
+        if (extras.length) s.content = parts[0] + '\n\n' + extras.filter(Boolean).join('\n')
+      }
+
+      if (s.id === 'what-we-will-deliver' && deliverables) {
+        s.content = s.content.replace(
+          '[Adjust the list based on what was selected in the enquiry.]',
+          `Based on the enquiry, the following deliverables have been selected: ${deliverables}.`
+        )
+      }
+
+      if (s.id === 'seo-opportunity' && context) {
+        s.content = s.content.replace(
+          'Based on what [Client Name] has shared with us, the current website is [not ranking for commercially relevant keywords / ranking inconsistently / losing ground to competitors who have invested in SEO].',
+          `Based on what ${company} has shared with us: ${context}`
+        )
+      }
+
+      if (s.id === 'our-plan') {
+        // Inject any specific services or goals into the plan preamble
+        if (services) {
+          s.content = s.content.replace(
+            'social media management, content creation, and paid advertising',
+            services.split(',').map((x: string) => x.trim()).join(', ')
+          )
+        }
+        if (goal) {
+          s.content = s.content.replace(
+            '[generates enquiries / takes direct bookings / showcases the work and builds credibility / feeds leads directly into a sales pipeline]',
+            goal
+          )
+        }
+      }
+
+      if (s.id === 'executive-summary') {
+        if (services) {
+          s.content = s.content.replace(
+            'social media management, content creation, and paid advertising across the channels most relevant to your audience',
+            services + ' across the channels most relevant to your audience'
+          )
+        }
+        if (brandStage) {
+          s.content = s.content.replace(
+            '[build a new brand from the ground up / refresh and modernise the existing identity / execute a full rebrand]',
+            brandStage === 'new' ? 'build a brand from the ground up' :
+            brandStage === 'refresh' ? 'refresh and modernise the existing identity' :
+            brandStage === 'rebrand' ? 'execute a full rebrand' : brandStage
+          )
+        }
+        if (pageCount) {
+          s.content = s.content.replace('[Page Count]', pageCount)
+        }
+      }
+    })
+
     return defaults
   }
 
@@ -219,7 +297,8 @@ export default function ProposalEditor({ proposal }: { proposal: any }) {
   }
 
   // ── PDF ──────────────────────────────────────────────────────────────────────
-  async function generatePDF() {
+
+    async function generatePDF() {
     await save()
     setGenerating(true)
     try {
@@ -254,6 +333,7 @@ export default function ProposalEditor({ proposal }: { proposal: any }) {
             {['draft','sent','negotiating','won','lost'].map(s => <option key={s} value={s}>{s}</option>)}
           </select>
           <div style={{ flex:1 }} />
+
           <div style={{ fontSize:'.72rem', color:'#6B7794', padding:'4px 10px', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.07)' }}>
             {SERVICE_LABELS[serviceType]}
           </div>
