@@ -290,7 +290,7 @@ function NurtureProposalModal({ entry, open, onClose }: { entry:any; open:boolea
     setSaving(true)
     const { data } = await supabase.from('proposals').insert({
       lead_id: entry.lead_id, title, status: 'draft', value: Number(value) || 0,
-      services: [], scope: `Lead sourced via ${entry.sequence_type} nurture sequence. Re-engaged after sustained interest.`, deliverables: '', timeline: '', pricing_breakdown: [],
+      services: [], scope: `Lead sourced via ${entry.sequence_type} nurture sequence. Re-engaged after sustained interest.`, deliverables: '', timeline: '', pricing_breakdown: [], service_type: 'full-ecosystem', client_company: lead.company ?? null, client_contact: `${lead.first_name} ${lead.last_name}`, sections: [],
       terms: 'Payment terms: 35% deposit on signing, 35% on milestone, 30% on completion.',
     }).select().single()
     if (data) { onClose(); router.push(`/proposals/${data.id}`); router.refresh() }

@@ -6,7 +6,7 @@ export default async function NurturePage() {
 
   const { data: entries } = await supabase
     .from('nurture_entries')
-    .select('*,leads(id,first_name,last_name,email,lead_score,lead_tier,country,form_type)')
+    .select('*,leads(id,first_name,last_name,email,company,lead_score,lead_tier,country,form_type)')
     .order('next_due', { ascending: true, nullsFirst: false })
 
   return <NurtureClient entries={entries ?? []} />

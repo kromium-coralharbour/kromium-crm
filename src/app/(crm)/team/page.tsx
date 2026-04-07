@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Topbar from '@/components/Topbar'
 import { Card } from '@/components/ui'
 import { initials, fmtDate } from '@/lib/utils'
+import { RoleSelect } from './RoleSelect'
 
 const ROLE_COLORS: Record<string, { bg: string; color: string }> = {
   admin:     { bg:'rgba(242,100,25,0.12)',  color:'#F26419' },
@@ -21,11 +22,16 @@ export default async function TeamPage() {
 
   return (
     <>
-      <Topbar title="Team" action={isAdmin ? { label:'+ Invite Member' } : undefined} />
+      <Topbar title="Team"  />
       <div style={{ flex:1, overflowY:'auto', padding:24 }}>
         {!isAdmin && (
           <div style={{ background:'rgba(107,119,148,0.1)', border:'1px solid rgba(107,119,148,0.2)', padding:'10px 16px', marginBottom:16, fontSize:'.82rem', color:'#9AA0B8' }}>
             Team management requires Admin access.
+          </div>
+        )}
+        {isAdmin && (
+          <div style={{ background:'rgba(242,100,25,0.06)', border:'1px solid rgba(242,100,25,0.2)', padding:'12px 16px', marginBottom:16, fontSize:'.82rem', color:'#9AA0B8', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <span>To add a team member: invite them in your <strong style={{ color:'#EEF0F5' }}>Supabase dashboard</strong> under Authentication, then they will appear here after their first login.</span>
           </div>
         )}
         <Card>
@@ -64,13 +70,7 @@ export default async function TeamPage() {
                       <td style={{ padding:'11px 16px', fontSize:'.78rem', color:'#6B7794', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>{fmtDate(m.created_at)}</td>
                       {isAdmin && (
                         <td style={{ padding:'11px 16px', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
-                          {!isMe && (
-                            <select defaultValue={m.role} style={{ background:'#192035', border:'1px solid rgba(255,255,255,0.07)', color:'#EEF0F5', fontSize:'.78rem', padding:'5px 8px', cursor:'pointer', outline:'none' }}>
-                              <option value="admin">Admin</option>
-                              <option value="manager">Manager</option>
-                              <option value="executive">Executive</option>
-                            </select>
-                          )}
+                          <RoleSelect memberId={m.id} currentRole={m.role} isMe={isMe} />
                         </td>
                       )}
                     </tr>

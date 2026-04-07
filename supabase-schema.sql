@@ -268,3 +268,9 @@ create trigger on_auth_user_created
 alter table project_tasks add column if not exists priority text default 'medium' check (priority in ('low','medium','high','urgent'));
 alter table project_tasks add column if not exists section text default 'Tasks';
 alter table project_tasks add column if not exists notes text;
+
+-- ── Proposal sections (run after initial schema) ──────────────────────────────
+alter table proposals add column if not exists sections jsonb not null default '[]';
+alter table proposals add column if not exists service_type text;
+alter table proposals add column if not exists client_company text;
+alter table proposals add column if not exists client_contact text;

@@ -1,158 +1,421 @@
 import React from 'react'
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, Line, Svg } from '@react-pdf/renderer'
 import { fmtFull$, fmtDate } from '@/lib/utils'
+import { ProposalSection } from '@/lib/proposal-sections'
+
+// ── Colour system ─────────────────────────────────────────────────────────────
+const C = {
+  navy:     '#0B0E1A',
+  navyMid:  '#141929',
+  orange:   '#F26419',
+  white:    '#FFFFFF',
+  offWhite: '#F8F9FC',
+  muted:    '#6B7794',
+  body:     '#1E2433',
+  rule:     '#E2E5EE',
+  green:    '#16A34A',
+}
 
 const styles = StyleSheet.create({
-  page:       { fontFamily:'Helvetica', backgroundColor:'#0B0E1A', color:'#EEF0F5', padding:48 },
-  header:     { marginBottom:28, paddingBottom:16, borderBottomWidth:2, borderBottomColor:'#F26419', borderBottomStyle:'solid' },
-  logo:       { fontSize:24, fontWeight:'bold', color:'#FFFFFF' },
-  logoAccent: { color:'#F26419' },
-  tagline:    { fontSize:8, color:'#6B7794', marginTop:4 },
-  row:        { flexDirection:'row', justifyContent:'space-between' },
-  contact:    { fontSize:8.5, color:'#6B7794', textAlign:'right' },
-  title:      { fontSize:22, fontWeight:'bold', color:'#FFFFFF', marginBottom:4 },
-  subtitle:   { fontSize:9.5, color:'#9AA0B8', marginBottom:16 },
-  divider:    { borderBottomWidth:1, borderBottomColor:'rgba(255,255,255,0.07)', borderBottomStyle:'solid', marginVertical:14 },
-  sectionLbl: { fontSize:9, fontWeight:'bold', color:'#F26419', letterSpacing:1.2, marginBottom:8, marginTop:18 },
-  body:       { fontSize:9, color:'#9AA0B8', lineHeight:1.7, marginBottom:8 },
-  infoBox:    { backgroundColor:'#141929', padding:14, marginTop:6, borderLeftWidth:3, borderLeftColor:'#F26419', borderLeftStyle:'solid' },
-  priceHead:  { flexDirection:'row', marginBottom:8 },
-  priceHdr:   { fontSize:8, color:'#6B7794' },
-  priceRow:   { flexDirection:'row', paddingVertical:6, borderBottomWidth:1, borderBottomColor:'rgba(255,255,255,0.07)', borderBottomStyle:'solid' },
-  priceLbl:   { fontSize:9, color:'#EEF0F5', flex:3 },
-  priceType:  { fontSize:8, color:'#6B7794', flex:1, textAlign:'center' },
-  priceAmt:   { fontSize:9, color:'#F26419', fontWeight:'bold', flex:1, textAlign:'right' },
-  totalRow:   { flexDirection:'row', justifyContent:'space-between', paddingTop:10, marginTop:4 },
-  totalLbl:   { fontSize:11, fontWeight:'bold', color:'#FFFFFF' },
-  totalVal:   { fontSize:13, fontWeight:'bold', color:'#22C55E' },
-  chip:       { backgroundColor:'rgba(242,100,25,0.15)', paddingVertical:3, paddingHorizontal:8, marginRight:6 },
-  chipText:   { fontSize:7.5, color:'#F26419', fontWeight:'bold' },
-  chips:      { flexDirection:'row', flexWrap:'wrap', marginBottom:18 },
-  footer:     { position:'absolute', bottom:32, left:48, right:48, borderTopWidth:1, borderTopColor:'rgba(255,255,255,0.07)', borderTopStyle:'solid', paddingTop:8, flexDirection:'row', justifyContent:'space-between' },
-  footerTxt:  { fontSize:7.5, color:'#6B7794' },
-  metaRow:    { flexDirection:'row', paddingVertical:6, borderBottomWidth:1, borderBottomColor:'rgba(255,255,255,0.07)', borderBottomStyle:'solid' },
-  metaLbl:    { fontSize:8, color:'#6B7794', width:90 },
-  metaVal:    { fontSize:8.5, color:'#EEF0F5', flex:1 },
+  // ── Page ──────────────────────────────────────────────────────────────────
+  page: {
+    fontFamily: 'Helvetica',
+    backgroundColor: C.white,
+    color: C.body,
+    paddingTop: 0,
+    paddingBottom: 52,
+    paddingLeft: 0,
+    paddingRight: 0,
+    fontSize: 9.5,
+    lineHeight: 1.65,
+  },
+
+  // ── Cover / Header ─────────────────────────────────────────────────────────
+  coverBlock: {
+    backgroundColor: C.navy,
+    paddingTop: 52,
+    paddingBottom: 44,
+    paddingLeft: 52,
+    paddingRight: 52,
+    marginBottom: 0,
+  },
+  coverTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 48,
+  },
+  wordmark: {
+    fontSize: 22,
+    fontFamily: 'Helvetica-Bold',
+    color: C.white,
+    letterSpacing: 1,
+  },
+  wordmarkDot: {
+    color: C.orange,
+  },
+  coverContact: {
+    fontSize: 8,
+    color: '#9AA0B8',
+    textAlign: 'right',
+    lineHeight: 1.8,
+  },
+  coverDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: C.orange,
+    borderBottomStyle: 'solid',
+    marginBottom: 24,
+  },
+  coverTitle: {
+    fontSize: 26,
+    fontFamily: 'Helvetica-Bold',
+    color: C.white,
+    letterSpacing: -0.5,
+    lineHeight: 1.2,
+    marginBottom: 12,
+  },
+  coverMeta: {
+    flexDirection: 'row',
+    gap: 24,
+    marginTop: 8,
+  },
+  coverMetaItem: {
+    flex: 1,
+  },
+  coverMetaLabel: {
+    fontSize: 7.5,
+    fontFamily: 'Helvetica-Bold',
+    color: C.orange,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    marginBottom: 3,
+  },
+  coverMetaValue: {
+    fontSize: 9.5,
+    color: '#EEF0F5',
+    fontFamily: 'Helvetica-Bold',
+  },
+
+  // ── Services strip ─────────────────────────────────────────────────────────
+  servicesStrip: {
+    backgroundColor: C.orange,
+    paddingVertical: 10,
+    paddingHorizontal: 52,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  serviceChip: {
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    paddingVertical: 3,
+    paddingHorizontal: 10,
+  },
+  serviceChipText: {
+    fontSize: 7.5,
+    fontFamily: 'Helvetica-Bold',
+    color: C.white,
+    letterSpacing: 0.8,
+  },
+
+  // ── Body layout ────────────────────────────────────────────────────────────
+  body: {
+    paddingHorizontal: 52,
+    paddingTop: 0,
+  },
+
+  // ── Section ────────────────────────────────────────────────────────────────
+  section: {
+    marginTop: 26,
+    marginBottom: 8,
+  },
+  sectionRule: {
+    borderBottomWidth: 1,
+    borderBottomColor: C.orange,
+    borderBottomStyle: 'solid',
+    marginBottom: 10,
+  },
+  sectionLabel: {
+    fontSize: 7.5,
+    fontFamily: 'Helvetica-Bold',
+    color: C.orange,
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontFamily: 'Helvetica-Bold',
+    color: C.navy,
+    letterSpacing: -0.3,
+    marginBottom: 10,
+  },
+  bodyText: {
+    fontSize: 9.5,
+    color: C.body,
+    lineHeight: 1.75,
+  },
+
+  // ── Investment table ────────────────────────────────────────────────────────
+  investBox: {
+    backgroundColor: C.offWhite,
+    borderLeftWidth: 3,
+    borderLeftColor: C.orange,
+    borderLeftStyle: 'solid',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginTop: 6,
+  },
+  investHeader: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: C.rule,
+    borderBottomStyle: 'solid',
+    paddingBottom: 6,
+    marginBottom: 6,
+  },
+  investHeaderText: {
+    fontSize: 7.5,
+    fontFamily: 'Helvetica-Bold',
+    color: C.muted,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  investRow: {
+    flexDirection: 'row',
+    paddingVertical: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: C.rule,
+    borderBottomStyle: 'solid',
+  },
+  investDesc: {
+    flex: 3,
+    fontSize: 9.5,
+    color: C.body,
+  },
+  investType: {
+    flex: 1,
+    fontSize: 8.5,
+    color: C.muted,
+    textAlign: 'center',
+    textTransform: 'capitalize',
+  },
+  investAmt: {
+    flex: 1,
+    fontSize: 9.5,
+    fontFamily: 'Helvetica-Bold',
+    color: C.navy,
+    textAlign: 'right',
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    marginTop: 4,
+  },
+  totalLabel: {
+    fontSize: 11,
+    fontFamily: 'Helvetica-Bold',
+    color: C.navy,
+  },
+  totalValue: {
+    fontSize: 13,
+    fontFamily: 'Helvetica-Bold',
+    color: C.green,
+  },
+
+  // ── Next steps box ─────────────────────────────────────────────────────────
+  nextStepsBox: {
+    backgroundColor: C.navy,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginTop: 6,
+  },
+  nextStepsText: {
+    fontSize: 9.5,
+    color: '#EEF0F5',
+    lineHeight: 1.75,
+  },
+
+  // ── Terms box ──────────────────────────────────────────────────────────────
+  termsBox: {
+    backgroundColor: C.offWhite,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 6,
+  },
+  termsText: {
+    fontSize: 8.5,
+    color: C.muted,
+    lineHeight: 1.7,
+  },
+
+  // ── Footer ─────────────────────────────────────────────────────────────────
+  footer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 52,
+    right: 52,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: C.rule,
+    borderTopStyle: 'solid',
+    paddingTop: 8,
+  },
+  footerLeft: {
+    fontSize: 7.5,
+    color: C.muted,
+  },
+  footerRight: {
+    fontSize: 7.5,
+    color: C.muted,
+  },
 })
 
 interface Props { proposal: any }
 
 export function ProposalPDFDocument({ proposal }: Props) {
   const pricing: any[] = proposal.pricing_breakdown ?? []
-  const total = pricing.reduce((s: number, p: any) => s + (p.amount ?? 0), 0)
-  const recipient = proposal.clients?.company_name
+  const total    = pricing.reduce((s: number, p: any) => s + (p.amount ?? 0), 0)
+  const sections: ProposalSection[] = Array.isArray(proposal.sections)
+    ? proposal.sections.filter((s: ProposalSection) => s.included)
+    : []
+  const clientName = proposal.client_company ?? proposal.clients?.company_name
     ?? (proposal.leads ? `${proposal.leads.first_name} ${proposal.leads.last_name}` : 'Valued Client')
+  const clientContact = proposal.client_contact ?? ''
+  const services: string[] = proposal.services ?? []
+
+  // Render a section's body text, handling the special cases
+  function renderSectionBody(section: ProposalSection) {
+    if (section.id === 'investment' || section.id.startsWith('investment-')) {
+      return (
+        <View>
+          {section.content ? <Text style={[styles.bodyText, { marginBottom: 8 }]}>{section.content}</Text> : null}
+          {pricing.length > 0 ? (
+            <View style={styles.investBox}>
+              <View style={styles.investHeader}>
+                <Text style={[styles.investHeaderText, { flex: 3 }]}>Description</Text>
+                <Text style={[styles.investHeaderText, { flex: 1, textAlign: 'center' }]}>Type</Text>
+                <Text style={[styles.investHeaderText, { flex: 1, textAlign: 'right' }]}>Amount</Text>
+              </View>
+              {pricing.map((item: any, i: number) => (
+                <View key={i} style={styles.investRow}>
+                  <Text style={styles.investDesc}>{item.description}</Text>
+                  <Text style={styles.investType}>{(item.type ?? '').replace(/_/g, ' ')}</Text>
+                  <Text style={styles.investAmt}>{fmtFull$(item.amount ?? 0)}</Text>
+                </View>
+              ))}
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>Total Investment</Text>
+                <Text style={styles.totalValue}>{fmtFull$(total)}</Text>
+              </View>
+            </View>
+          ) : null}
+        </View>
+      )
+    }
+
+    if (section.id === 'next-steps' || section.id.startsWith('next-steps-')) {
+      return (
+        <View style={styles.nextStepsBox}>
+          <Text style={styles.nextStepsText}>{section.content}</Text>
+        </View>
+      )
+    }
+
+    if (section.id === 'terms' || section.id.startsWith('terms-')) {
+      return (
+        <View style={styles.termsBox}>
+          <Text style={styles.termsText}>{section.content}</Text>
+        </View>
+      )
+    }
+
+    return <Text style={styles.bodyText}>{section.content}</Text>
+  }
 
   return (
     <Document title={proposal.title}>
       <Page size="A4" style={styles.page}>
 
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.row}>
-            <View>
-              <Text style={styles.logo}>
-                {'KROMIUM'}
-                <Text style={styles.logoAccent}>{'.'}</Text>
-              </Text>
-              <Text style={styles.tagline}>DIGITAL TRANSFORMATION PARTNER</Text>
+        {/* Cover block — navy background */}
+        <View style={styles.coverBlock}>
+          <View style={styles.coverTopRow}>
+            <Text style={styles.wordmark}>
+              KROMIUM<Text style={styles.wordmarkDot}>.</Text>
+            </Text>
+            <Text style={styles.coverContact}>
+              info@kromiumagency.com{'\n'}
+              (246) 232-1006{'\n'}
+              kromiumdigital.com{'\n'}
+              Barbados, Caribbean
+            </Text>
+          </View>
+
+          <View style={styles.coverDivider} />
+
+          <Text style={styles.coverTitle}>{proposal.title}</Text>
+
+          <View style={styles.coverMeta}>
+            <View style={styles.coverMetaItem}>
+              <Text style={styles.coverMetaLabel}>Prepared For</Text>
+              <Text style={styles.coverMetaValue}>{clientName}</Text>
+              {clientContact ? <Text style={{ fontSize:8.5, color:'#9AA0B8', marginTop:2 }}>{clientContact}</Text> : null}
             </View>
-            <View>
-              <Text style={styles.contact}>hello@kromiumdigital.com</Text>
-              <Text style={styles.contact}>(246) 232-1006</Text>
-              <Text style={styles.contact}>kromiumdigital.com</Text>
-              <Text style={styles.contact}>Barbados, Caribbean</Text>
+            <View style={styles.coverMetaItem}>
+              <Text style={styles.coverMetaLabel}>Date</Text>
+              <Text style={styles.coverMetaValue}>{fmtDate(proposal.created_at)}</Text>
+            </View>
+            {proposal.valid_until ? (
+              <View style={styles.coverMetaItem}>
+                <Text style={styles.coverMetaLabel}>Valid Until</Text>
+                <Text style={styles.coverMetaValue}>{fmtDate(proposal.valid_until)}</Text>
+              </View>
+            ) : null}
+            <View style={styles.coverMetaItem}>
+              <Text style={styles.coverMetaLabel}>Prepared By</Text>
+              <Text style={styles.coverMetaValue}>Kromium Marketing</Text>
+              <Text style={{ fontSize:8.5, color:'#9AA0B8', marginTop:2 }}>& Development Inc.</Text>
             </View>
           </View>
         </View>
 
-        {/* Title block */}
-        <Text style={styles.title}>{proposal.title}</Text>
-        <Text style={styles.subtitle}>
-          {`Prepared for ${recipient}  ·  ${fmtDate(proposal.created_at)}`}
-          {proposal.valid_until ? `  ·  Valid until ${fmtDate(proposal.valid_until)}` : ''}
-        </Text>
-
-        {/* Service chips */}
-        {(proposal.services ?? []).length > 0 && (
-          <View style={styles.chips}>
-            {(proposal.services as string[]).map((s: string) => (
-              <View key={s} style={styles.chip}>
-                <Text style={styles.chipText}>{s.toUpperCase()}</Text>
+        {/* Services strip — orange bar */}
+        {services.length > 0 && (
+          <View style={styles.servicesStrip}>
+            {services.map((s: string) => (
+              <View key={s} style={styles.serviceChip}>
+                <Text style={styles.serviceChipText}>{s.toUpperCase()}</Text>
               </View>
             ))}
           </View>
         )}
 
-        <View style={styles.divider} />
-
-        {/* Scope */}
-        {proposal.scope ? (
-          <View>
-            <Text style={styles.sectionLbl}>SCOPE OF WORK</Text>
-            <Text style={styles.body}>{proposal.scope}</Text>
-          </View>
-        ) : null}
-
-        {/* Deliverables */}
-        {proposal.deliverables ? (
-          <View>
-            <Text style={styles.sectionLbl}>DELIVERABLES</Text>
-            <Text style={styles.body}>{proposal.deliverables}</Text>
-          </View>
-        ) : null}
-
-        {/* Timeline */}
-        {proposal.timeline ? (
-          <View>
-            <Text style={styles.sectionLbl}>TIMELINE</Text>
-            <Text style={styles.body}>{proposal.timeline}</Text>
-          </View>
-        ) : null}
-
-        {/* Pricing */}
-        {pricing.length > 0 ? (
-          <View>
-            <Text style={styles.sectionLbl}>INVESTMENT</Text>
-            <View style={styles.infoBox}>
-              <View style={styles.priceHead}>
-                <Text style={[styles.priceHdr, { flex:3 }]}>Description</Text>
-                <Text style={[styles.priceHdr, { flex:1, textAlign:'center' }]}>Type</Text>
-                <Text style={[styles.priceHdr, { flex:1, textAlign:'right' }]}>Amount</Text>
-              </View>
-              {pricing.map((item: any, i: number) => (
-                <View key={i} style={styles.priceRow}>
-                  <Text style={styles.priceLbl}>{item.description}</Text>
-                  <Text style={styles.priceType}>{(item.type ?? '').replace(/_/g, ' ')}</Text>
-                  <Text style={styles.priceAmt}>{fmtFull$(item.amount ?? 0)}</Text>
-                </View>
-              ))}
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLbl}>Total Investment</Text>
-                <Text style={styles.totalVal}>{fmtFull$(total)}</Text>
-              </View>
+        {/* Body sections */}
+        <View style={styles.body}>
+          {sections.map((section: ProposalSection) => (
+            <View key={section.id} style={styles.section} wrap={false}>
+              <View style={styles.sectionRule} />
+              <Text style={styles.sectionLabel}>{section.title.toUpperCase()}</Text>
+              {renderSectionBody(section)}
             </View>
-          </View>
-        ) : null}
-
-        {/* Terms */}
-        {proposal.terms ? (
-          <View>
-            <Text style={styles.sectionLbl}>TERMS AND CONDITIONS</Text>
-            <Text style={styles.body}>{proposal.terms}</Text>
-          </View>
-        ) : null}
+          ))}
+        </View>
 
         {/* Footer */}
         <View style={styles.footer} fixed>
-          <Text style={styles.footerTxt}>Kromium Marketing and Development Inc.  ·  Barbados</Text>
+          <Text style={styles.footerLeft}>
+            Kromium Marketing and Development Inc. — Barbados, Caribbean — Confidential
+          </Text>
           <Text
-            style={styles.footerTxt}
+            style={styles.footerRight}
             render={({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
               `Page ${pageNumber} of ${totalPages}`
             }
           />
         </View>
+
       </Page>
     </Document>
   )

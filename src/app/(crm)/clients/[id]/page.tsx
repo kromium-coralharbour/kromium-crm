@@ -29,7 +29,7 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
 
   return (
     <>
-      <Topbar title={client.company_name} action={{ label:'+ New Project' }} />
+      <Topbar title={client.company_name}  />
       <div style={{ flex:1, overflowY:'auto', padding:24 }}>
 
         {/* Header */}

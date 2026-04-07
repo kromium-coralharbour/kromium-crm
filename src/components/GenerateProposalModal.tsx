@@ -1,4 +1,5 @@
 'use client'
+import { FORM_TYPE_TO_SERVICE } from '@/lib/proposal-sections'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -144,6 +145,10 @@ export default function GenerateProposalModal({ lead, notes, open, onClose }: Pr
         terms:             form.terms,
         valid_until:       form.valid_until || null,
         pricing_breakdown: [],
+        service_type:      FORM_TYPE_TO_SERVICE[lead.form_type ?? ''] ?? 'full-ecosystem',
+        client_company:    lead.company ?? null,
+        client_contact:    `${lead.first_name} ${lead.last_name}`,
+        sections:          [],
       }).select().single()
 
       if (err || !proposal) throw new Error(err?.message ?? 'Failed to create proposal')
