@@ -97,19 +97,15 @@ export default function EnquiriesClient({ leads, hotCount, warmCount, coldCount,
                 {leads.map(l => {
                   const ftLabel = FORM_TYPES.find(f => f.value === l.form_type)?.label ?? l.form_type?.replace(/-/g, ' ') ?? '—'
                   return (
-                    <tr key={l.id} className="hover:bg-white/[0.02]">
+                    <tr key={l.id} className="hover:bg-white/[0.02]" onClick={() => router.push(`/enquiries/${l.id}`)} style={{ cursor: 'pointer' }}>
                       <td style={{ padding: '11px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                        <Link href={`/enquiries/${l.id}`} style={{ textDecoration: 'none' }}>
                           <div style={{ fontWeight: 600, color: '#EEF0F5' }}>{l.first_name} {l.last_name}</div>
                           <div style={{ fontSize: '.7rem', color: '#6B7794' }}>{l.email}</div>
-                        </Link>
                       </td>
-                      <td style={{ padding: '11px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                        <Link href={buildHref(undefined, l.form_type)} style={{ textDecoration: 'none' }}>
+                      <td style={{ padding: '11px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }} onClick={e => { e.stopPropagation(); router.push(buildHref(undefined, l.form_type)) }}>
                           <span style={{ fontSize: '.72rem', fontWeight: 600, color: '#F26419', background: 'rgba(242,100,25,0.08)', padding: '2px 7px', cursor: 'pointer' }}>
                             {ftLabel}
                           </span>
-                        </Link>
                       </td>
                       <td style={{ padding: '11px 16px', fontSize: '.82rem', color: '#9AA0B8', borderBottom: '1px solid rgba(255,255,255,0.07)', textTransform: 'capitalize' }}>{l.industry?.replace(/_/g, ' ') ?? '—'}</td>
                       <td style={{ padding: '11px 16px', fontSize: '.82rem', color: '#9AA0B8', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>{l.country ?? '—'}</td>
